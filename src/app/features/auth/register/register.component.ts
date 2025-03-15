@@ -1,8 +1,10 @@
 import {Component, OnDestroy, OnInit} from "@angular/core"
 import {AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms"
 import {CommonModule} from '@angular/common';
-import { RouterModule} from '@angular/router';
-import {Subject} from 'rxjs';
+import {Router, RouterModule} from '@angular/router';
+import {catchError, finalize, Subject, takeUntil} from 'rxjs';
+import {HttpClient} from '@angular/common/http';
+import {AuthService} from '../../../core/auth/services/auth.service';
 
 @Component({
   selector: "app-register",
@@ -10,7 +12,7 @@ import {Subject} from 'rxjs';
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    RouterModule
+    RouterModule,
   ],
   templateUrl: "./register.component.html",
   styleUrls: ["./register.component.css"],
@@ -24,6 +26,8 @@ export class RegisterComponent implements OnInit, OnDestroy {
 
   constructor(
     private formBuilder: FormBuilder,
+    private router: Router,
+    private authService: AuthService
   ) {
   }
 
@@ -73,13 +77,32 @@ export class RegisterComponent implements OnInit, OnDestroy {
 
     const registrationData = {
       email: this.formControl['email'].value,
-      password: this.formControl['password'].value
+      password: this.formControl['password'].value,
+      password_confirmation: this.formControl['confirmPassword'].value
     };
 
-    console.log('this.registerForm', JSON.stringify(registrationData));
-    setTimeout(() => {
-      this.loading = false;
-    }, 2000);
+    this.authService.register(registrationData)
+      .pipe(
+        takeUntil(this.destroy$),
+        catchError(error => {
+          console.log(error)
+          this.errorMessage = error || 'Registration failed. Please try again.';
+          throw error
+        }),
+        finalize(() => {
+          this.loading = false;
+        })
+      )
+      .subscribe({
+        next: (response) => {
+          this.router.navigate(['/'], {
+            queryParams: { registered: 'success' }
+          });
+        },
+        error: () => {
+          console.log('Error occurred');
+        }
+      })
   }
 }
 

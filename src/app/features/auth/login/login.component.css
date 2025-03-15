@@ -1,25 +1,24 @@
-/* This CSS file can be shared between login and register components */
-
 .auth-container {
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
+  padding: 20px;
   background-color: #f5f5f5;
 }
 
 .auth-card {
   width: 100%;
-  max-width: 400px;
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  max-width: 450px;
   padding: 30px;
+  border-radius: 8px;
+  background-color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .auth-title {
   text-align: center;
-  margin-bottom: 24px;
+  margin-bottom: 30px;
   color: #333;
   font-size: 24px;
 }
@@ -27,46 +26,55 @@
 .auth-form {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 20px;
 }
 
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
 
-label {
+.form-group label {
   font-weight: 500;
   color: #555;
-  font-size: 14px;
 }
 
-input {
+.form-group input {
   padding: 12px 16px;
   border: 1px solid #ddd;
   border-radius: 4px;
-  font-size: 14px;
+  font-size: 16px;
   transition: border-color 0.2s;
 }
 
-input:focus {
+.form-group input:focus {
   outline: none;
   border-color: #4a90e2;
+  box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
 }
 
-input.is-invalid {
+.form-group input.is-invalid {
   border-color: #dc3545;
 }
 
 .error-message {
   color: #dc3545;
-  font-size: 12px;
+  font-size: 14px;
   margin-top: 4px;
 }
 
+.alert-error {
+  padding: 12px;
+  background-color: #ffeaea;
+  border: 1px solid #ffcccc;
+  border-radius: 4px;
+  color: #dc3545;
+  margin-bottom: 16px;
+}
+
 .form-actions {
-  margin-top: 8px;
+  margin-top: 12px;
 }
 
 .btn-primary {
@@ -86,13 +94,14 @@ input.is-invalid {
   background-color: #3a7bc8;
 }
 
-.btn-primary:active {
-  background-color: #2a6db8;
+.btn-primary:disabled {
+  background-color: #9ac2f0;
+  cursor: not-allowed;
 }
 
 .auth-footer {
-  margin-top: 16px;
   text-align: center;
+  margin-top: 20px;
   font-size: 14px;
   color: #666;
 }
@@ -100,9 +109,9 @@ input.is-invalid {
 .auth-footer a {
   color: #4a90e2;
   text-decoration: none;
+  font-weight: 500;
 }
 
 .auth-footer a:hover {
   text-decoration: underline;
 }
-

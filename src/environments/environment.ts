@@ -1,3 +1,3 @@
 export const devEnvironment = {
-  apiUrl:
+  apiUrl: 'http://localhost:3000',
 }

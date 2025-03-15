@@ -3,6 +3,11 @@
     <h2 class="auth-title">Login</h2>
 
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="auth-form">
+      <!-- Show error message if registration fails -->
+      <div *ngIf="errorMessage" class="alert-error">
+        {{ errorMessage }}
+      </div>
+
       <div class="form-group">
         <label for="email">Email</label>
         <input
@@ -10,11 +15,11 @@
           formControlName="email"
           id="email"
           placeholder="Enter your email"
-          [ngClass]="{ 'is-invalid': submitted && f['email'].errors }"
+          [ngClass]="{ 'is-invalid': submitted && formControl['email'].errors }"
         />
-        <div *ngIf="submitted && f['email'].errors" class="error-message">
-          <div *ngIf="f['email'].errors['required']">Email is required</div>
-          <div *ngIf="f['email'].errors['email']">Please enter a valid email</div>
+        <div *ngIf="submitted && formControl['email'].errors" class="error-message">
+          <div *ngIf="formControl['email'].errors['required']">Email is required</div>
+          <div *ngIf="formControl['email'].errors['email']">Please enter a valid email</div>
         </div>
       </div>
 
@@ -25,22 +30,23 @@
           formControlName="password"
           id="password"
           placeholder="Enter your password"
-          [ngClass]="{ 'is-invalid': submitted && f['password'].errors }"
+          [ngClass]="{ 'is-invalid': submitted && formControl['password'].errors }"
         />
-        <div *ngIf="submitted && f['password'].errors" class="error-message">
-          <div *ngIf="f['password'].errors['required']">Password is required</div>
-          <div *ngIf="f['password'].errors['minlength']">Password must be at least 6 characters</div>
+        <div *ngIf="submitted && formControl['password'].errors" class="error-message">
+          <div *ngIf="formControl['password'].errors['required']">Password is required</div>
         </div>
       </div>
 
       <div class="form-actions">
-        <button type="submit" class="btn-primary">Login</button>
+        <button type="submit" class="btn-primary" [disabled]="loading">
+          <span *ngIf="loading">Login...</span>
+          <span *ngIf="!loading">Login</span>
+        </button>
       </div>
 
       <div class="auth-footer">
-        <p>Don't have an account? <a routerLink="/register">Register</a></p>
+        <p>Already have an account? <a routerLink="/register">Register</a></p>
       </div>
     </form>
   </div>
 </div>
-
