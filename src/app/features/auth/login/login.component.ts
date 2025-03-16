@@ -3,7 +3,7 @@ import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/
 import {CommonModule} from '@angular/common';
 import {Router, RouterModule} from '@angular/router';
 import {catchError, finalize, Subject, takeUntil} from 'rxjs';
-import {AuthService} from '../../../core/auth/services/auth.service';
+import {AuthService} from '../../../core/services/auth/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -75,7 +75,7 @@ export class LoginComponent implements OnInit, OnDestroy{
       )
       .subscribe({
         next: (response) => {
-          console.log(response);
+          this.router.navigate(['/home']);
         },
         error: (error) => {
           this.errorMessage = error || 'Login failed. Please try again.'

@@ -1,0 +1,132 @@
+<app-navbar></app-navbar>
+
+<div class="app-container">
+  <div class="feed-container">
+    <div class="feed-header">
+      <h2 class="feed-title">Questions Near You</h2>
+      <div class="feed-filters">
+        <button class="filter-button active">Newest</button>
+        <button class="filter-button">Closest</button>
+        <button class="filter-button">Popular</button>
+      </div>
+    </div>
+
+    <div *ngIf="locationError" class="location-error">
+      <p>{{ locationError }}</p>
+    </div>
+
+    <div *ngIf="isLoading" class="loading-indicator">
+      <div class="loading-spinner"></div>
+      <p>Loading questions...</p>
+    </div>
+
+    <div *ngIf="!isLoading && (questions$ | async)?.length === 0" class="no-questions">
+      <div class="empty-state">
+        <div class="empty-icon">❓</div>
+        <h3>No questions yet</h3>
+        <p>Be the first to ask something in your area!</p>
+        <button class="btn-primary" (click)="navigateToNewQuestion()">Ask a Question</button>
+      </div>
+    </div>
+
+    <div class="question-feed">
+      <div *ngFor="let question of questions$ | async" class="post-card" (click)="navigateToQuestion(question.id)">
+        <div class="post-header">
+          <div class="post-author">
+            <div class="author-avatar">{{ question.user.email.charAt(0) }}</div>
+            <div class="author-info">
+              <div class="author-name">{{ question.user.email }}</div>
+              <div class="post-meta">
+                <span class="post-time">{{ question.created_at | date:'MMM d' }}</span>
+<!--                <span class="post-location" *ngIf="question.distance !== undefined">-->
+<!--                  • {{ question.distance }} km away-->
+<!--                </span>-->
+              </div>
+            </div>
+          </div>
+          <div class="post-options">
+            <button class="options-button">•••</button>
+          </div>
+        </div>
+
+        <div class="post-content">
+          <h3 class="post-title">{{ question.title }}</h3>
+          <p class="post-text">{{ question.content }}</p>
+        </div>
+
+        <div class="post-footer">
+          <button
+            class="action-button"
+          >
+            <span class="action-icon">♥</span>
+            <span class="action-count">{{ question.likes.length }}</span>
+          </button>
+
+          <button class="action-button">
+            <span class="action-icon">💬</span>
+            <span class="action-count">{{ question.answers.length }}</span>
+          </button>
+
+          <button class="action-button">
+            <span class="action-icon">↗</span>
+            <span class="action-text">Share</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sidebar">
+    <div class="sidebar-section">
+      <h3 class="sidebar-title">Your Stats</h3>
+      <div class="stats-container">
+        <div class="stat-item">
+          <div class="stat-value">0</div>
+          <div class="stat-label">Questions</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">0</div>
+          <div class="stat-label">Answers</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">0</div>
+          <div class="stat-label">Likes</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <h3 class="sidebar-title">Trending Topics</h3>
+      <div class="topics-list">
+        <div class="topic-item">
+          <span class="topic-name">#LocalFood</span>
+          <span class="topic-count">24 questions</span>
+        </div>
+        <div class="topic-item">
+          <span class="topic-name">#Transportation</span>
+          <span class="topic-count">18 questions</span>
+        </div>
+        <div class="topic-item">
+          <span class="topic-name">#Events</span>
+          <span class="topic-count">12 questions</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <h3 class="sidebar-title">About</h3>
+      <p class="about-text">
+        SocialQ connects you with people in your area to ask and answer questions about your community.
+      </p>
+      <div class="about-links">
+        <a href="#">Help</a>
+        <a href="#">Terms</a>
+        <a href="#">Privacy</a>
+      </div>
+    </div>
+  </div>
+
+  <button class="floating-action-button" (click)="navigateToNewQuestion()">
+    <span class="fab-icon">+</span>
+  </button>
+</div>

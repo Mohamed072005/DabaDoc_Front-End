@@ -1,0 +1,37 @@
+<nav class="navbar">
+  <div class="navbar-container">
+    <div class="navbar-brand" (click)="navigateTo('/')">
+      <h1 class="brand-name">SocialQ</h1>
+    </div>
+
+    <div class="navbar-search">
+      <div class="search-container">
+        <input type="text" placeholder="Search questions..." class="search-input">
+        <span class="search-icon">🔍</span>
+      </div>
+    </div>
+
+    <div class="navbar-actions">
+      <button class="nav-button" (click)="navigateTo('/questions/new')">
+        <span class="nav-icon">✚</span>
+        <span class="nav-text">Ask</span>
+      </button>
+
+      <button class="nav-button" (click)="navigateTo('/favorites')">
+        <span class="nav-icon">♥</span>
+        <span class="nav-text">Favorites</span>
+      </button>
+
+      <div class="user-menu">
+        <div class="user-avatar" [title]="currentUser?.email || 'User'">
+          {{ currentUser?.email?.charAt(0) || 'U' }}
+        </div>
+      </div>
+
+      <button class="logout-button" (click)="logout()">
+        <span class="nav-text">Logout</span>
+      </button>
+    </div>
+  </div>
+</nav>
+

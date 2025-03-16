@@ -4,7 +4,7 @@ import {CommonModule} from '@angular/common';
 import {Router, RouterModule} from '@angular/router';
 import {catchError, finalize, Subject, takeUntil} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
-import {AuthService} from '../../../core/auth/services/auth.service';
+import {AuthService} from '../../../core/services/auth/auth.service';
 
 @Component({
   selector: "app-register",
