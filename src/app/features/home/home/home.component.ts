@@ -1,13 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import {catchError, finalize, map, Observable, of} from 'rxjs';
-import {CommonModule} from '@angular/common';
-import {NavbarComponent} from '../navbar/navbar.component';
-import {QuestionService} from '../../../core/services/question/question.service';
-import {Question} from '../../../core/models/question.model';
-import {User} from '../../../core/models/user.model';
-import {AuthService} from '../../../core/services/auth/auth.service';
-import {CreateQuestionModalComponent} from '../create-question-modal/create-question-modal.component';
+import { Subscription } from 'rxjs';
+import { CommonModule } from '@angular/common';
+import { NavbarComponent } from '../navbar/navbar.component';
+import { QuestionService } from '../../../core/services/question/question.service';
+import { Question } from '../../../core/models/question.model';
+import { User } from '../../../core/models/user.model';
+import { AuthService } from '../../../core/services/auth/auth.service';
+import { CreateQuestionModalComponent } from '../create-question-modal/create-question-modal.component';
+import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 
 @Component({
   selector: 'app-home',
@@ -16,17 +17,22 @@ import {CreateQuestionModalComponent} from '../create-question-modal/create-ques
   imports: [
     CommonModule,
     NavbarComponent,
-    NavbarComponent,
-    CreateQuestionModalComponent
+    CreateQuestionModalComponent,
+    InfiniteScrollModule
   ],
   styleUrls: ['./home.component.css']
 })
 export class HomeComponent implements OnInit {
-  questions$!: Observable<Question[]>;
+  questions: Question[] = [];
   locationError: string | null = null;
-  isLoading: boolean = true;
+  isLoading: boolean = false;
   currentUser: User | null = null;
   isQuestionModalOpen: boolean = false;
+  currentPage: number = 1;
+  totalPages: number = 1;
+  scrollLoadin: boolean = false;
+
+  private subscriptions: Subscription = new Subscription();
 
   constructor(
     private router: Router,
@@ -35,57 +41,61 @@ export class HomeComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.authService.currentUser$.subscribe((user) => {
+    const userSub = this.authService.currentUser$.subscribe((user) => {
       this.currentUser = user;
-    })
+    });
+    this.subscriptions.add(userSub);
+
     this.loadQuestions();
   }
 
   loadQuestions(): void {
+    if (this.isLoading || this.currentPage > this.totalPages) return;
+
     this.isLoading = true;
-    this.questions$ = this.questionService.fetchQuestion().pipe(
-      map(response => {
-        return (response.questions || []).map((question: Question) => {
-          if (!question.likes) question.likes = [];
-          if (!question.answers) question.answers = [];
-          return question;
-        });
-      }),
-      catchError(error => {
+    this.questionService.fetchQuestions(this.currentPage).subscribe({
+      next: (response) => {
+        this.questions = [...this.questions, ...response.questions];
+        this.totalPages = response.totalPages;
+        this.currentPage++;
+      },
+      error: (error) => {
         console.error('Error fetching questions:', error);
         this.locationError = 'Failed to load questions. Please try again.';
-        return of([]);
-      }),
-      finalize(() => {
+      },
+      complete: () => {
         this.isLoading = false;
-      })
-    );
+      }
+    });
+  }
+
+  onScroll(): void {
+    this.scrollLoadin = true;
+    setTimeout(() => {
+      this.loadQuestions()
+      this.scrollLoadin = false;
+    }, 1500)
+
   }
 
   toggleLike(event: Event): void {
-    event.stopPropagation(); // Prevent navigation to question detail
+    event.stopPropagation();
     // this.questionService.toggleLike(question.id).subscribe()
   }
 
-  navigateToQuestion(questionId: string): void {
-    this.router.navigate(['/questions', questionId]);
-  }
-
   navigateToNewQuestion(): void {
-    console.log("navigateToNewQuestion");
-    this.openQuestionModal()
+    this.openQuestionModal();
   }
 
   openQuestionModal(): void {
-    this.isQuestionModalOpen = true
+    this.isQuestionModalOpen = true;
   }
 
   closeQuestionModal(): void {
-    this.isQuestionModalOpen = false
+    this.isQuestionModalOpen = false;
   }
 
-  handleQuestionCreated(question: any): void {
-    console.log("Question created:", question)
+  handleQuestionCreated(): void {
     this.loadQuestions()
   }
 }

@@ -19,9 +19,9 @@ import {AuthService} from '../../../core/services/auth/auth.service';
 })
 export class RegisterComponent implements OnInit, OnDestroy {
   registerForm!: FormGroup;
-  submitted = false;
-  loading = false;
-  errorMessage = '';
+  submitted: boolean = false;
+  loading: boolean = false;
+  errorMessage: string = '';
   private destroy$ = new Subject<void>();
 
   constructor(

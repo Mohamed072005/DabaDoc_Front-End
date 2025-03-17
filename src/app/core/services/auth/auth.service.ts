@@ -106,7 +106,7 @@ export class AuthService {
     return this.currentUserSubject.value;
   }
 
-  get isAuthenticated(): boolean {
+  isAuthenticated(): boolean {
     return !!this.getToken() && !!this.getCurrentUser();
   }
 

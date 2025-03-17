@@ -88,7 +88,7 @@ export class CreateQuestionModalComponent implements OnInit, OnDestroy {
     this.isLoading = true;
     this.errorMessage = ''
 
-    if (!this.authService.isAuthenticated){
+    if (!this.authService.isAuthenticated()){
       this.handleAuthError();
       return;
     }
@@ -105,9 +105,9 @@ export class CreateQuestionModalComponent implements OnInit, OnDestroy {
       return;
     }
     const subscription = this.questionService.createQuestion(questionData, token).subscribe({
-      next: (response: Question) => {
+      next: (response) => {
         this.isLoading = false;
-        this.questionCreated.emit(response);
+        this.questionCreated.emit();
         this.close.emit();
         this.resetForm();
       },

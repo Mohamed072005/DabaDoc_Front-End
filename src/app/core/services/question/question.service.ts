@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
-import {HttpClient, HttpHeaders} from '@angular/common/http';
+import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
 import {devEnvironment} from '../../../../environments/environment';
-import {catchError, Observable, throwError} from 'rxjs';
+import {catchError, map, Observable, throwError} from 'rxjs';
 import {Question, QuestionFormData} from '../../models/question.model';
 
 @Injectable({ providedIn: 'root' })
@@ -9,16 +9,24 @@ export class QuestionService {
   private apiUrl: string = devEnvironment.apiUrl;
   constructor(private http: HttpClient) {}
 
-  fetchQuestion(): Observable<{questions: Question[]}> {
-    return this.http.get<{questions: Question[]}>(`${this.apiUrl}/question/get/questions`)
+  fetchQuestions(page: number = 1, perPage: number = 5): Observable<{ questions: Question[], totalPages: number, totalCount: number }> {
+    const params = new HttpParams()
+      .set('page', page.toString())
+      .set('perPage', perPage.toString());
+    return this.http.get<any>(`${this.apiUrl}/question/get/questions`, { params: params })
       .pipe(
+        map(response => ({
+          questions: response.data.questions,
+          totalPages: response.data.total_pages,
+          totalCount: response.data.total_count
+        })),
         catchError(this.handleError)
       )
   }
 
-  createQuestion(question: QuestionFormData, token: string): Observable<Question> {
+  createQuestion(question: QuestionFormData, token: string): Observable<{ message: string, question: Question }> {
     const headers = new HttpHeaders({'Authorization': token});
-    return this.http.post<Question>(`${this.apiUrl}/question/create`, question, { headers: headers })
+    return this.http.post<{ message: string, question: Question }>(`${this.apiUrl}/question/create`, question, { headers: headers })
       .pipe(
         catchError(this.handleError)
       )

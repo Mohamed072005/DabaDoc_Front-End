@@ -20,7 +20,7 @@
       <p>Loading questions...</p>
     </div>
 
-    <div *ngIf="!isLoading && (questions$ | async)?.length === 0" class="no-questions">
+    <div *ngIf="!isLoading && questions.length === 0" class="no-questions">
       <div class="empty-state">
         <div class="empty-icon">❓</div>
         <h3>No questions yet</h3>
@@ -29,8 +29,8 @@
       </div>
     </div>
 
-    <div class="question-feed">
-      <div *ngFor="let question of questions$ | async" class="post-card" (click)="navigateToQuestion(question.id)">
+    <div class="question-feed" infiniteScroll [infiniteScrollDistance]="2" [infiniteScrollThrottle]="300" (scrolled)="onScroll()">
+      <div *ngFor="let question of questions" class="post-card">
         <div class="post-header">
           <div class="post-author">
             <div class="author-avatar">{{ question.user.email.charAt(0) }}</div>
@@ -38,9 +38,6 @@
               <div class="author-name">{{ question.user.email }}</div>
               <div class="post-meta">
                 <span class="post-time">{{ question.created_at | date:'MMM d' }}</span>
-<!--                <span class="post-location" *ngIf="question.distance !== undefined">-->
-<!--                  • {{ question.distance }} km away-->
-<!--                </span>-->
               </div>
             </div>
           </div>
@@ -55,9 +52,7 @@
         </div>
 
         <div class="post-footer">
-          <button
-            class="action-button"
-          >
+          <button class="action-button">
             <span class="action-icon">♥</span>
             <span class="action-count">{{ question.likes.length }}</span>
           </button>
@@ -73,6 +68,10 @@
           </button>
         </div>
       </div>
+    </div>
+    <div *ngIf="scrollLoadin" class="scroll-loading">
+      <div class="loading-spinner"></div>
+      <p>Loading questions...</p>
     </div>
   </div>
 
@@ -133,8 +132,6 @@
   <app-create-question-modal
     [isOpen]="isQuestionModalOpen"
     (close)="closeQuestionModal()"
-    (questionCreated)="handleQuestionCreated($event)"
-  >
-
-  </app-create-question-modal>
+    (questionCreated)="handleQuestionCreated()"
+  ></app-create-question-modal>
 </div>
