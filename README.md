@@ -29,8 +29,8 @@ SocialQ allows users to:
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/socialq-frontend.git
-cd socialq-frontend
+git clone https://github.com/Mohamed072005/DabaDoc_Front-End.git
+cd DabaDoc_Front-End
 ```
 
 2. Install dependencies:
