@@ -7,6 +7,7 @@ import {QuestionService} from '../../../core/services/question/question.service'
 import {Question} from '../../../core/models/question.model';
 import {User} from '../../../core/models/user.model';
 import {AuthService} from '../../../core/services/auth/auth.service';
+import {CreateQuestionModalComponent} from '../create-question-modal/create-question-modal.component';
 
 @Component({
   selector: 'app-home',
@@ -15,7 +16,8 @@ import {AuthService} from '../../../core/services/auth/auth.service';
   imports: [
     CommonModule,
     NavbarComponent,
-    NavbarComponent
+    NavbarComponent,
+    CreateQuestionModalComponent
   ],
   styleUrls: ['./home.component.css']
 })
@@ -24,6 +26,7 @@ export class HomeComponent implements OnInit {
   locationError: string | null = null;
   isLoading: boolean = true;
   currentUser: User | null = null;
+  isQuestionModalOpen: boolean = false;
 
   constructor(
     private router: Router,
@@ -42,11 +45,8 @@ export class HomeComponent implements OnInit {
     this.isLoading = true;
     this.questions$ = this.questionService.fetchQuestion().pipe(
       map(response => {
-        // Ensure each question has the expected structure
         return (response.questions || []).map((question: Question) => {
-          // Make sure likes is always an array
           if (!question.likes) question.likes = [];
-          // Make sure answers is always an array
           if (!question.answers) question.answers = [];
           return question;
         });
@@ -73,5 +73,19 @@ export class HomeComponent implements OnInit {
 
   navigateToNewQuestion(): void {
     console.log("navigateToNewQuestion");
+    this.openQuestionModal()
+  }
+
+  openQuestionModal(): void {
+    this.isQuestionModalOpen = true
+  }
+
+  closeQuestionModal(): void {
+    this.isQuestionModalOpen = false
+  }
+
+  handleQuestionCreated(question: any): void {
+    console.log("Question created:", question)
+    this.loadQuestions()
   }
 }

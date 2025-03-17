@@ -27,7 +27,9 @@ interface AuthResponse {
 export class AuthService {
   private apiUrl: string = devEnvironment.apiUrl;
   private currentUserSubject = new BehaviorSubject<User | null>(null);
+  private tokenSubject = new BehaviorSubject<string | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
+  public token$ = this.tokenSubject.asObservable();
   private isBrowser: boolean;
 
   constructor(
@@ -35,10 +37,24 @@ export class AuthService {
     @Inject(PLATFORM_ID) private platformId: Object,
   ) {
     this.isBrowser = isPlatformBrowser(this.platformId);
-    if (this.isBrowser){
+    this.loadStoredUserData()
+  }
+
+  private loadStoredUserData(): void {
+    if (this.isBrowser) {
       const storedUser = localStorage.getItem('currentUser');
       if (storedUser) {
-        this.currentUserSubject.next(JSON.parse(storedUser));
+        try {
+          this.currentUserSubject.next(JSON.parse(storedUser));
+        } catch (e) {
+          console.error('Error parsing stored user data:', e);
+          this.clearStoredData();
+        }
+      }
+
+      const storedToken = localStorage.getItem('token');
+      if (storedToken) {
+        this.tokenSubject.next(storedToken);
       }
     }
   }
@@ -53,17 +69,18 @@ export class AuthService {
   login(userData: LoginData): Observable<AuthResponse> {
     return this.http.post<any>(`${this.apiUrl}/auth/login`, userData)
       .pipe(
-        tap((response: AuthResponse) => {
-          if (this.isBrowser) {
-            // Save the token and user to localStorage
-            localStorage.setItem('token', response.data.token);
-            localStorage.setItem('currentUser', JSON.stringify(response.data.user));
-            // Update the currentUserSubject
-            this.currentUserSubject.next(response.data.user);
-          }
-        }),
+        tap((response: AuthResponse) => this.handleAuthResponse(response)),
         catchError(this.handleError)
       )
+  }
+
+  private handleAuthResponse(response: AuthResponse): void {
+    if (this.isBrowser && response?.data) {
+      localStorage.setItem('token', response.data.token);
+      localStorage.setItem('currentUser', JSON.stringify(response.data.user));
+      this.currentUserSubject.next(response.data.user);
+      this.tokenSubject.next(response.data.token);
+    }
   }
 
   private handleError(error: HttpErrorResponse): Observable<never> {
@@ -73,15 +90,36 @@ export class AuthService {
     }else {
       errorMessage = error.error.error || `Error Code: ${error.status}, Message: ${error.error}`;
     }
-
     return throwError(() => new Error(errorMessage));
   }
 
   logout(): void {
-    if (this.isBrowser){
-      localStorage.removeItem('token');
-      localStorage.removeItem('currentUser');
+    this.clearAuthData();
+    this.currentUserSubject.next(null);
+  }
+
+  getToken(): string | null {
+    return this.tokenSubject.value;
+  }
+
+  getCurrentUser(): User | null {
+    return this.currentUserSubject.value;
+  }
+
+  get isAuthenticated(): boolean {
+    return !!this.getToken() && !!this.getCurrentUser();
+  }
+
+  private clearAuthData(): void {
+    if (this.isBrowser) {
+      this.clearStoredData();
     }
     this.currentUserSubject.next(null);
+    this.tokenSubject.next(null);
+  }
+
+  private clearStoredData(): void {
+    localStorage.removeItem('token');
+    localStorage.removeItem('currentUser');
   }
 }

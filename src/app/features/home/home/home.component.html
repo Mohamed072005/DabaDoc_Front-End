@@ -129,4 +129,12 @@
   <button class="floating-action-button" (click)="navigateToNewQuestion()">
     <span class="fab-icon">+</span>
   </button>
+
+  <app-create-question-modal
+    [isOpen]="isQuestionModalOpen"
+    (close)="closeQuestionModal()"
+    (questionCreated)="handleQuestionCreated($event)"
+  >
+
+  </app-create-question-modal>
 </div>

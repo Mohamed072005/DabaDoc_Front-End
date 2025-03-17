@@ -1,0 +1,57 @@
+<div class="modal-overlay" [class.open]="isOpen" (click)="closeModal()">
+  <div class="modal-container" (click)="preventClose($event)">
+    <div class="modal-header">
+      <h2 class="modal-title">Ask a Question</h2>
+      <button class="close-button" (click)="closeModal()">×</button>
+    </div>
+
+    <div class="modal-body">
+      <form [formGroup]="questionForm" (ngSubmit)="onSubmit()" class="question-form">
+        <div class="form-group">
+          <label for="title">Title</label>
+          <input
+            type="text"
+            id="title"
+            formControlName="title"
+            placeholder="What's your question about?"
+            [ngClass]="{'invalid': questionForm.get('title')?.invalid && questionForm.get('title')?.touched}"
+          >
+          <div class="error-message" *ngIf="questionForm.get('title')?.invalid && questionForm.get('title')?.touched">
+            <span *ngIf="questionForm.get('title')?.errors?.['required']">Title is required</span>
+            <span *ngIf="questionForm.get('title')?.errors?.['minlength']">Title must be at least 5 characters</span>
+            <span *ngIf="questionForm.get('title')?.errors?.['maxlength']">Title cannot exceed 100 characters</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="content">Details</label>
+          <textarea
+            id="content"
+            formControlName="content"
+            rows="6"
+            placeholder="Provide more details about your question..."
+            [ngClass]="{'invalid': questionForm.get('content')?.invalid && questionForm.get('content')?.touched}"
+          ></textarea>
+          <div class="error-message" *ngIf="questionForm.get('content')?.invalid && questionForm.get('content')?.touched">
+            <span *ngIf="questionForm.get('content')?.errors?.['required']">Content is required</span>
+            <span *ngIf="questionForm.get('content')?.errors?.['minlength']">Content must be at least 20 characters</span>
+            <span *ngIf="questionForm.get('content')?.errors?.['maxlength']">Content cannot exceed 1000 characters</span>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn-secondary" (click)="closeModal()">Cancel</button>
+      <button
+        type="button"
+        class="btn-primary"
+        [disabled]='isLoading'
+        (click)="onSubmit()"
+      >
+        {{ isLoading ? 'Posting...' : 'Post Question' }}
+      </button>
+    </div>
+  </div>
+</div>
+
