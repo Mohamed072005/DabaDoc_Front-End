@@ -127,11 +127,3 @@ Contributions are welcome! Here's how you can contribute:
 - Infinite scrolling is implemented for better user experience
 
 This will generate optimized production files in the `dist/` directory.
-
-## 🌟 Features to Implement
-
-- User profile management
-- Question categories/tags
-- Notifications system
-- Search functionality
-- Geolocation-based filtering
